@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %} {{ object.title }} {% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h2>{{ object.title }}</h2>
+        <p>Date: {{ object.created_at }}</p>
+        <p>{{ object.body }}</p>
+        <p>{% lorem 3 p random %}</p>
+        <p><a href="{% url 'posts' %}" class="btn btn-dark btn-sm">Back</a></p>
+    </div>
+</div>
+<hr>
+<!--show all comment -->
+<div class="card">
+    <div class="card-header bg-dark text-light">Comment</div>
+    <div class="card-body">
+        {% if all_comments %}
+        {% for comment in all_comments %}
+        <p class="font-weight-bold border">{{ comment.user }} -- {{ comment.created_at }}</p>
+        <p>{{ comment.comment }}
+            {% for reply in comment.reply_set.all %}
+            <div class="ml-5">
+        <p class="font-weight-bold border">{{ reply.user }} -- {{ reply.created_at }}</p>
+        {{ reply.reply }}
+    </div>
+    {% endfor %}
+    </p>
+    <p id=""><a href="" onclick="ReplyCMT({{comment.pk}})">Reply</a></p>
+<!--    Reply comment -->
+    {% if user.is_authenticated %}
+    <form action="{% url 'reply' comment.pk %}" method="post">
+        {% csrf_token %}
+        <span id="reply_{{comment.pk}}"></span>
+    </form>
+    {% else %}
+    <p class="btn btn-success">Login to comment and reply</p>
+    {% endif %}
+<!--    end reply-->
+    {% endfor %}
+    {% endif %}
+</div>
+</div>
+<hr>
+<!--comment-->
+<div class="card">
+    <div class="card-header bg-dark text-light">Your comment</div>
+    <div class="card-body">
+        {% if user.is_authenticated %}
+        <form action="{% url 'comment' object.pk %}" method="post">
+            {% csrf_token %}
+            <input type="text" class="form-control" name="comment" placeholder="Comment...">
+            <input type="submit" class="btn btn-dark"></p>
+        </form>
+        {% else %}
+        <p><a href="" class="btn btn-danger">Login to Comment</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+
